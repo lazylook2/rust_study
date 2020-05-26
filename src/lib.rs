@@ -2,6 +2,7 @@ pub mod common;
 pub mod structs;
 pub mod concurrency;
 pub mod enum_match;
+pub mod collections;
 
 pub use common::c1;
 pub use structs::s1;
