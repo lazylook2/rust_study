@@ -2,7 +2,8 @@
 use rust_study::s1;
 use rust_study::structs::s2;
 use rust_study::enum_match::{em1, em2};
+use rust_study::collections::vector;
 
 fn main() {
-    em2();
+    vector();
 }
