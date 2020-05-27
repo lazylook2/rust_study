@@ -44,3 +44,44 @@ pub fn vector() {
         SpreadsheetCell::Float(10.12),
     ];
 }
+pub fn String1() {
+    let data = "initial contents"; // 字符串字面值
+    let mut s = String::new();
+    let s = data.to_string(); // String
+    let s = "initial contents".to_string();
+    let s = String::from("initial contents");
+
+    let mut s = String::from("foo");
+    s.push_str("bar");
+    s.push('d');
+
+    let s1 = String::from("tic");
+    let s2 = String::from("tac");
+    let s = s1 + "-" + &s2; // String 和 &str。s1 被移动了，不能继续使用
+    let s = format!("{}-{}", s2, s2);
+    assert_eq!("tac-tac", &s);assert_eq!("tac-tac", s);
+
+    // String 是一个 Vec<u8> 的封装。
+    let hello = "Здравствуйте";
+    let s = &hello[0..4]; // 字符串 slice
+    assert_eq!("Зд", s);
+
+    for c in "नमस्ते".chars() {
+        println!("{}", c);
+    }
+    for b in "नमस्ते".bytes() {
+        println!("{}", b);
+    }
+
+    fn first_word(s: &String) -> usize {
+        let bytes = s.as_bytes();
+
+        for (i, &item) in bytes.iter().enumerate() {
+            if item == b' ' {
+                return i;
+            }
+        }
+
+        s.len()
+    }
+}
