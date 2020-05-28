@@ -3,6 +3,7 @@ pub mod structs;
 pub mod concurrency;
 pub mod enum_match;
 pub mod collections;
+pub mod error;
 
 pub use common::c1;
 pub use structs::s1;

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub fn vector() {
     let v: Vec<i32> = Vec::new();
     let mut v = vec![1, 2, 3];
@@ -46,7 +48,7 @@ pub fn vector() {
 }
 pub fn String1() {
     let data = "initial contents"; // 字符串字面值
-    let mut s = String::new();
+    let mut s = String::new(); // String 这样拥有所有权，被移动就回不来了
     let s = data.to_string(); // String
     let s = "initial contents".to_string();
     let s = String::from("initial contents");
@@ -66,6 +68,13 @@ pub fn String1() {
     let s = &hello[0..4]; // 字符串 slice
     assert_eq!("Зд", s);
 
+    let s = String::from("hello world");
+    let hello = &s[0..5];
+    let world = &s[6..11];
+    // 其他类型的 slice
+    let a = [1, 2, 3, 4, 5];
+    let slice = &a[1..3];
+
     for c in "नमस्ते".chars() {
         println!("{}", c);
     }
@@ -73,15 +82,83 @@ pub fn String1() {
         println!("{}", b);
     }
 
-    fn first_word(s: &String) -> usize {
+    fn first_word(s: &str) -> &str {
         let bytes = s.as_bytes();
 
         for (i, &item) in bytes.iter().enumerate() {
             if item == b' ' {
-                return i;
+                return &s[..i];
             }
         }
-
-        s.len()
+        &s[..]
     }
+    let mut s = String::from("hello world");
+    let word = first_word(&s); // word 的值为 5
+    s.clear(); // 这清空了字符串，使其等于 ""
+    // println!("word: {}", word); // 借用规则，当拥有某值的不可变引用时（这个值原来就是可变的），就不能再获取一个可变引用。
+
+    let my_string = String::from("hello world");
+    // first_word 中传入 `String` 的 slice
+    let word = first_word(&my_string[..]);assert_eq!(word, "hello");
+    let my_string_literal = "hello world";
+    // first_word 中传入字符串字面值的 slice
+    let word = first_word(&my_string_literal[..]);assert_eq!(word, "hello");
+    // 因为字符串字面值 **就是** 字符串 slice，
+    // 这样写也可以，即不使用 slice 语法！
+    let word = first_word(my_string_literal);assert_eq!(word, "hello");
+    println!("my_string_literal: {}", my_string_literal); // &str还能调用了
+    let a11 = String::from("dd");
+    fn a1 (s: String) {
+        println!("s: {}", s)
+    }
+    a1(a11);
+    // println!("a11: {}", a11); // String不能调用了
+
+}
+pub fn map1 () {
+    let mut scores1: HashMap<String, i32> = HashMap::new(); // 泛型可以省略
+    scores1.insert(String::from("Blue"), 10);
+
+    // HashMap的构建方式可以使用一个元组的 vector 的 collect 方法
+    let teams = vec![String::from("Blue"), String::from("Yellow")];
+    let initial_scores = vec![10, 50];
+    let scores: HashMap<_, _> = teams.iter().zip(initial_scores.iter()).collect();
+    // HashMap<_, _> 类型注解是必要的
+    // 因为可能 collect 很多不同的数据结构，而除非显式指定否则 Rust 无从得知你需要的类型。
+    // 但是对于键和值的类型参数来说，可以使用下划线占位，而 Rust 能够根据 vector 中数据的类型推断出 HashMap 所包含的类型。
+
+    let field_name = String::from("Favorite color");
+    let field_value = String::from("Blue");
+
+    let mut map = HashMap::new();
+    map.insert(field_name, field_value);
+    // 这里 field_name 和 field_value 不再有效
+    // 如果将值的引用插入哈希 map，这些值本身将不会被移动进哈希 map。
+    // 但是这些引用指向的值必须至少在哈希 map 有效时也是有效的。涉及到生命周期
+
+// 访问哈希 map 中的值
+    let blue = &String::from("Blue");
+    println!("{}", scores1.get(blue).unwrap());
+
+    for (key, value) in &scores1 {
+        println!("{}: {}", key, value);
+    }
+
+// 更新哈希 map
+    // 覆盖一个值
+    scores1.insert(String::from("Blue"), 25);
+    println!("{:?}", scores1);
+    // 只在键没有对应值时插入
+    scores1.entry(String::from("Yellow")).or_insert(0);
+    println!("{:?}", scores1);
+    // 根据旧值更新一个值
+    let text = "hello world wonderful world";
+    let mut map = HashMap::new();
+    for word in text.split_whitespace() {
+        // or_insert 方法事实上会返回这个键的值的一个可变引用（&mut V）
+        let count = map.entry(word).or_insert(0);
+        println!("{}\tcount: {}", word, count);
+        *count += 1;
+    }
+    println!("{:?}", map);
 }
