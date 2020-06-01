@@ -1,7 +1,7 @@
 #![allow(unused_variables)]
 #[allow(unused_mut)]
-use rust_study::error::e1;
+use rust_study::error::e2;
 
 fn main() {
-    e1();
+    e2();
 }

@@ -1,7 +1,8 @@
 use std::fs::File;
-use std::io::ErrorKind;
+use std::io::{ErrorKind, Read, Error};
+use std::{io, fs};
 
-pub fn e1 () {
+/*pub fn e1 () {
 // 使用result处理潜在的错误
 // enum Result<T, E> {
 //     Ok(T),
@@ -40,4 +41,48 @@ pub fn e1 () {
 
     // 使用 expect 提供一个好的错误信息可以表明你的意图并更易于追踪 panic 的根源。
     let f = File::open("hello.txt").expect("无法打开。。。。 hello.txt");
+}*/
+pub fn e2 () {
+// 传播错误（方法里编写，直接抛出错误）
+    fn read_username_from_file() -> Result<String, io::Error> {
+        let mut f = File::open("fuck.txt");
+        let mut f = match f {
+            Ok(file) => file,
+            Err(e) => return Err(e),
+        };
+        let mut s = String::new();
+        match f.read_to_string(&mut s) {
+            Ok(_) => Ok(s),
+            Err(e) => Err(e),
+        }
+    }
+    let f = read_username_from_file();
+
+    match f {
+        Ok(string) => println!("fuck.txt的内容为：{}", string),
+        Err(e) => panic!("读取fuck.txt的内容失败: {:?}", e),
+    }
+
+    /// Result 值之后的 ? 与match 表达式有着完全相同的工作方式。
+    /// 如果 Result 的值是 Ok，这个表达式将会返回 Ok 中的值而程序将继续执行。
+    /// 如果值是 Err，Err 中的值将作为整个函数的返回值，就好像使用了 return 关键字一样
+    fn read_username_from_file1() -> Result<String, io::Error> {
+        /*let mut f = File::open("fuck.txt")?;
+        let mut s = String::new();
+        f.read_to_string(&mut s)?;*/
+        // 可以链式调用，下面可以取代注释内容
+
+        /*let mut s = String::new();
+        File::open("fuck.txt")?.read_to_string(&mut s)?;*/
+        // 更简便的写法如下：
+        fs::read_to_string("fuck.txt")
+
+    }
+    let f = read_username_from_file();
+
+    match f {
+        Ok(string) => println!("fuck.txt的内容为：{}", string),
+        Err(e) => panic!("读取fuck.txt的内容失败: {:?}", e),
+    }
+
 }
