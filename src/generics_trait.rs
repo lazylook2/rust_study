@@ -191,3 +191,36 @@ pub fn traits() {
     // let pair = Pair::new(2, 3);
     pair.cmp_display();
 }
+pub fn lifetime() {
+    fn longest(x: &str, y: &str) -> &str{
+        if x.len() > y.len() {
+            x
+        } else {
+
+        }
+    }
+    let string1 = String::from("abcd");
+    let string2 = "xyz";
+
+    // 当我们定义这个函数的时候，并不知道传递给函数的具体值，所以也不知道到底是 if 还是 else 会被执行。
+    // 我们也不知道传入的引用的具体生命周期，那样通过观察作用域来确定返回的引用是否总是有效。
+    let result = longest(string1.as_str(), string2);
+    println!("The longest string is {}", result);
+
+    // 参数类型
+    // &i32    // 引用
+    // &'a i32 // 带有显示生命周期的引用
+    // &'a mut i32 // 带有显示声明周期的可变引用
+
+    fn longest1<'a> (x: &'a str, y: &'a str) -> &'a str{
+        if x.len() > y.len() {
+            x
+        } else {
+            y
+        }
+    }
+    // 这里我们想要告诉 Rust 关于参数中的引用和返回值之间的限制是他们都必须拥有相同的生命周期
+
+
+
+}
