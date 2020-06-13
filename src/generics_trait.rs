@@ -192,7 +192,7 @@ pub fn traits() {
     pair.cmp_display();
 }
 pub fn lifetime() {
-    fn longest(x: &str, y: &str) -> &str{
+    /*fn longest(x: &str, y: &str) -> &str{
         if x.len() > y.len() {
             x
         } else {
@@ -205,13 +205,18 @@ pub fn lifetime() {
     // 当我们定义这个函数的时候，并不知道传递给函数的具体值，所以也不知道到底是 if 还是 else 会被执行。
     // 我们也不知道传入的引用的具体生命周期，那样通过观察作用域来确定返回的引用是否总是有效。
     let result = longest(string1.as_str(), string2);
-    println!("The longest string is {}", result);
+    println!("The longest string is {}", result);*/
 
     // 参数类型
     // &i32    // 引用
     // &'a i32 // 带有显示生命周期的引用
     // &'a mut i32 // 带有显示声明周期的可变引用
 
+    // 这里我们想要告诉 Rust 关于参数中的引用和返回值之间的限制是他们都必须拥有相同的生命周期
+
+    // 当具体的引用被传递给 longest 时，被 'a 所替代的具体生命周期是 x 的作用域与 y 的作用域相重叠的那一部分。
+    // 换一种说法就是泛型生命周期 'a 的具体生命周期等同于 x 和 y 的生命周期中较小的那一个。
+    // 因为我们用相同的生命周期参数 'a 标注了返回的引用值，所以返回的引用值就能保证在 x 和 y 中较短的那个生命周期结束之前保持有效。
     fn longest1<'a> (x: &'a str, y: &'a str) -> &'a str{
         if x.len() > y.len() {
             x
@@ -219,8 +224,46 @@ pub fn lifetime() {
             y
         }
     }
-    // 这里我们想要告诉 Rust 关于参数中的引用和返回值之间的限制是他们都必须拥有相同的生命周期
+
+    // string1 直到外部作用域结束都是有效的，string2 则在内部作用域中是有效的，而 result 则引用了一些直到内部作用域结束都是有效的值。
+    // 借用检查器认可这些代码；它能够编译和运行，并打印出 The longest string is long string is long。
+    let string1 = String::from("abcd");
+    {
+        let string2 = "xyz";
+        let result = longest1(string1.as_str(), string2);
+        println!("The longest string is {}", result);
+    }
 
 
+    let string1 = String::from("abcd");
+    let result ;
+    {
+        let string2 = String::from("xyz");
+        let string2 = "xyz"; // ????????????????????  为啥能运行呢
+        result = longest1(string1.as_str(), string2);
+    }
+    println!("result: {}", result);
 
+    /// 参数 y 指定，因为 y 的生命周期与参数 x 和返回值的生命周期没有任何关系。
+    fn longest2<'a>(x: &'a str, y: &str) -> &'a str {
+        x
+    }
+
+    /*/// 当从函数返回一个引用，返回值的生命周期参数需要与一个参数的生命周期参数相匹配。
+    /// 如果返回的引用 没有 指向任何一个参数，那么唯一的可能就是它指向一个函数内部创建的值，它将会是一个悬垂引用
+    /// 因为它将会在函数结束时离开作用域
+    fn longest3<'a>(x: &str, y: &str) -> &'a str {
+        let result = String::from("really long string");
+        result.as_str()
+    }*/
+
+// 结构体定义中的生命周期注解
+    #[derive(Debug)]
+    struct ImportantExcerpt<'a> {
+        part: &'a str,
+    }
+    let novel = String::from("Call me Ishmael. Some years ago...");
+    let first_sentence = novel.split('.').next().expect("Could not find a '.'");
+    let i = ImportantExcerpt{ part: first_sentence };
+    println!("ImportantExcerpt: {:#?}", i);
 }

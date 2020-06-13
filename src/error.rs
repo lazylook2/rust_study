@@ -85,7 +85,9 @@ pub fn e2 () {
         Err(e) => panic!("读取fuck.txt的内容失败: {:?}", e),
     }
 
+    let secret_number = 3;
     loop {
+        let mut guess = String::new();
         // --snip--
         let guess: i32 = match guess.trim().parse() {
             Ok(num) => num,
@@ -96,7 +98,7 @@ pub fn e2 () {
             continue;
         }
         match guess.cmp(&secret_number) {
-            // --snip--
+            _ => (),
         }
     }
     pub struct Guess {
