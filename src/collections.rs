@@ -45,6 +45,12 @@ pub fn vector() {
         SpreadsheetCell::Text(String::from("blue")),
         SpreadsheetCell::Float(10.12),
     ];
+// 该函数接受Vec<String>类型参数
+    fn parse_config(args: &[String]) -> (&str, &str) {
+        let query  = &args[1];
+        let filename = &args[2];
+        (query, filename)
+    }
 }
 pub fn String1() {
     let data = "initial contents"; // 字符串字面值

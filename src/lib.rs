@@ -5,6 +5,8 @@ pub mod enum_match;
 pub mod collections;
 pub mod error;
 pub mod generics_trait;
+pub mod tests;
+
 
 pub use common::c1;
 pub use structs::s1;
