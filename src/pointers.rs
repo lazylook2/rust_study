@@ -29,3 +29,4 @@ pub fn box1() {
         _ => (),
     }
 }
+pub fn deref_trait () {}
