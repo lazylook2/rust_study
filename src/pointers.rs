@@ -18,7 +18,13 @@ pub fn box1() {
     let i = 2;
     match list {
         Cons(i, b) => {
-            println!("i: {}", i)
+            println!("i: {}", i);
+            match b.as_ref() { // ??????????? 这里需要有方法（从Box<List> 到 List）
+                Cons(i, b) => {
+                    println!("i: {}", i);
+                },
+                _ => (),
+            }
         }
         _ => (),
     }
