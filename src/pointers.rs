@@ -29,4 +29,5 @@ pub fn box1() {
         _ => (),
     }
 }
+/// 通过 Deref trait 将智能指针当作常规引用处理
 pub fn deref_trait () {}
