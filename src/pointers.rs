@@ -62,5 +62,44 @@ pub fn deref_trait () {
     }
     let m = MyBox::new(String::from("hehe"));
     println!("*m: {}", *m);
+
+// 解引用强制多态：是 Rust 在函数或方法传参上的一种便利。
+// 【其将实现了 Deref 的类型的引用转换为原始类型通过 Deref 所能够转换的类型的引用。】
+// 【当这种特定类型的引用作为实参传递给和形参类型不同的函数或方法时，解引用强制多态将自动发生。】
+// 上面的 &m 为 &MyBox<String>， Rust 可以通过 deref 转换为 &String，就是 实现了Deref 的类型的引用 转换为 原始类型的引用（&String）
+
+
+// 点进 Deref   https://doc.rust-lang.org/std/ops/trait.Deref.html#associated-types
+    // #[lang = "deref"]
+    // #[doc(alias = "*")]
+    // #[doc(alias = "&*")]
+    // #[stable(feature = "rust1", since = "1.0.0")]
+    // pub trait Deref {
+    //     /// The resulting type after dereferencing.
+    //     #[stable(feature = "rust1", since = "1.0.0")]
+    //     type Target: ?Sized;
+    //
+    //     /// Dereferences the value.
+    //     #[must_use]
+    //     #[stable(feature = "rust1", since = "1.0.0")]
+    //     fn deref(&self) -> &Self::Target;
+    // }
+
+// 对 fn deref(&self) 右键 -> 转到 -> definition(s)
+// 标准库中提供了 String 上的 Deref 实现，其会返回字符串 slice
+// Rust 再次调用 deref 将 &String 变为 &str
+    // #[stable(feature = "rust1", since = "1.0.0")]
+    // impl ops::Deref for String {
+    //     type Target = str;
+    //
+    //     #[inline]
+    //     fn deref(&self) -> &str {
+    //         unsafe { str::from_utf8_unchecked(&self.vec) }
+    //     }
+    // }
+
+
     hello(&m);
+    // 如果 Rust 没有实现解引用强制多态
+    hello(&(*m)[..]);
 }
