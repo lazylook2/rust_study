@@ -1,5 +1,5 @@
-use std::borrow::Borrow;
 use std::ops::Deref;
+
 
 /// 当有一个在编译时未知大小的类型，而又想要在需要确切大小的上下文中使用这个类型值的时候 （方法里面有）
 /// 当有大量数据并希望在确保数据不被拷贝的情况下转移所有权的时候 （需要例子）
@@ -102,4 +102,79 @@ pub fn deref_trait () {
     hello(&m);
     // 如果 Rust 没有实现解引用强制多态
     hello(&(*m)[..]);
+
+    // Rust 在发现类型和 trait 实现满足三种情况时会进行解引用强制多态：
+
+    // 当 T: Deref<Target=U> 时从 &T 到 &U。
+    // 当 T: DerefMut<Target=U> 时从 &mut T 到 &mut U。
+    // 当 T: Deref<Target=U> 时从 &mut T 到 &U。
+
+    // 第三个情况有些微妙：Rust 也会将可变引用强转为不可变引用。
+    // 但是反之是 不可能 的：不可变引用永远也不能强转为可变引用。
+    // 因为根据借用规则，如果有一个可变引用，其必须是这些数据的唯一引用（否则程序将无法编译）。
+    // 将一个可变引用转换为不可变引用永远也不会打破借用规则。
+    // 将不可变引用转换为可变引用则需要数据只能有一个不可变引用，而借用规则无法保证这一点。
+    // 因此，Rust 无法假设将不可变引用转换为可变引用是可能的。
+}
+/// 使用 Drop Trait 运行清理代码：其允许我们在值要离开作用域时执行一些代码
+pub fn drop_trait() {
+
+    struct CustomSmartPointer {
+        data: String,
+    }
+    impl  Drop for CustomSmartPointer{
+        fn drop(&mut self) {
+            println!("正在进行离开作用域时的清除方法，数据为：{}", self.data);
+        }
+    }
+    let c = CustomSmartPointer { data: String::from("my stuff") };
+    println!("CustomSmartPointers created.");
+    // 通过 std::mem::drop 提早丢弃值
+    drop(c); // 丢弃在结束之前
+    println!("CustomSmartPointer dropped before the end of main.");
+
+    // CustomSmartPointers created.
+    // 正在进行离开作用域时的清除方法，数据为：my stuff
+    // CustomSmartPointer dropped before the end of main.
+}
+/// Rc<T> 引用计数智能指针. 注意 Rc<T> 只能用于单线程场景
+pub fn Rc () {
+    #[derive(Debug)]
+    enum List {
+        Cons(i32, Rc<List>),
+        Nil,
+    }
+
+    use List::{Cons, Nil};
+    use std::rc::Rc;
+
+    let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
+    let b = Cons(3, Rc::clone(&a)); // 或 a.clone();
+    let c = Cons(4, Rc::clone(&a));
+    // Rc::clone 的实现并不像大部分类型的 clone 实现那样对所有数据进行深拷贝。
+    // Rc::clone 只会增加引用计数
+    println!("{:?}", b);
+
+    // 每个引用计数变化的点，会打印出引用计数，其值可以通过调用 Rc::strong_count 函数获得
+    let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
+    println!("count after creating a = {}", Rc::strong_count(&a));
+    let b = Cons(3, Rc::clone(&a));
+    println!("count after creating b = {}", Rc::strong_count(&a));
+    {
+        let c = Cons(4, Rc::clone(&a));
+        println!("count after creating c = {}", Rc::strong_count(&a));
+    }
+    println!("count after c goes out of scope = {}", Rc::strong_count(&a));
+
+// 测试最初的为可变引用，其他变量clone引用之后改变之前的变量值，检查引用的变量 值是否改变
+
+    // 有别的引用之后，就不要改值了（待检查）
+    struct AA { aa: Rc<i32>, bb: i32 }
+    let mut x = Rc::new(3);
+    let a = AA{ aa: Rc::clone(&x), bb: 0 };
+    let b = AA{ aa: Rc::clone(&x), bb: 1 };
+    println!("x引用次数：{}", Rc::strong_count(&x)); // x引用次数：3
+    // *Rc::get_mut(&mut x).unwrap() = 4; // thread 'main' panicked at 'called `Option::unwrap()` on a `None` value',
+    println!("x: {}", x);
+
 }
