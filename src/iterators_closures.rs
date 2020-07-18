@@ -55,9 +55,9 @@ pub fn Closures() {
             }
         }
     }
-// 闭包会捕获其环境
+// 闭包会捕获其环境，强制闭包获取其使用的环境值的所有权
     let x = 4;
-    let equal_to_x = |z| z == x;
+    let equal_to_x = |z| z == x; // move |z| z == x;
     let y = 4;
     assert!(equal_to_x(y));
 

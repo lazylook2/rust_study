@@ -1,4 +1,6 @@
 use std::ops::Deref;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 
 /// 当有一个在编译时未知大小的类型，而又想要在需要确切大小的上下文中使用这个类型值的时候 （方法里面有）
@@ -146,7 +148,6 @@ pub fn Rc () {
     }
 
     use List::{Cons, Nil};
-    use std::rc::Rc;
 
     let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
     let b = Cons(3, Rc::clone(&a)); // 或 a.clone();
@@ -182,7 +183,7 @@ pub fn refcell(){
     pub trait Messenger {
         fn send (&self, msg: &str);
     }
-    pub struct LimitTracker<'a, T: Messenger> {
+    pub struct LimitTracker<'a, T: Messenger> { // trait作为参数，同时使用生命周期参数
         messenger: &'a T,
         value: usize,
         max: usize,
@@ -196,6 +197,7 @@ pub fn refcell(){
                 max
             }
         }
+        // 这里是设置值，所以用可变
         pub fn set_value(&mut self, value: usize){
             self.value = value;
             let percentage_of_max = self.value as f64 / self.max as f64;
@@ -208,6 +210,90 @@ pub fn refcell(){
             }
         }
     }
+    struct MockMessenger {
+        sent_messages: RefCell<Vec<String>>
+    }
+    impl MockMessenger{
+        fn new() -> MockMessenger{
+            MockMessenger{ sent_messages: RefCell::new(vec![]) }
+        }
+    }
+    impl Messenger for MockMessenger {
+        fn send(&self, msg: &str) {
+            // 如果参数不为可变那就需要 sent_messages: RefCell<Vec<String>>,
+            // self.sent_messages.push(String::from(msg));
+
+            // borrow_mut 以获取 vector 的可变引用
+            self.sent_messages.borrow_mut().push(String::from(msg))
+        }
+    }
+
+    let mock_messenger = MockMessenger::new();
+    let mut limit_tracker = LimitTracker::new(&mock_messenger,100);
+    limit_tracker.set_value(80);
+    // borrow() 以获取 vector 的不可变引用
+    assert_eq!(mock_messenger.sent_messages.borrow().len(), 1);
+
+    // borrow 方法返回 Ref 类型的智能指针，
+    // borrow_mut 方法返回 RefMut 类型的智能指针。
+    // RefCell<T> 在任何时候只允许有多个不可变借用或一个可变借用。
+
+    let a = "TT";
+    let one_refcell = RefCell::new(String::from(a));
+    let mut ref1 = one_refcell.borrow_mut();
+    // let ref2 = one_refcell.borrow();
+    ref1.push_str("2222");
+    // one_refcell.borrow() 为不可变引用，*one_refcell.borrow() 为String类型
+    println!("{:?}", one_refcell);
+
+
+    // 结合 Rc<T> 和 RefCell<T> 来拥有多个可变数据所有者
+    #[derive(Debug)]
+    enum List{
+        Cons(Rc<RefCell<i32>>, Rc<List>),
+        Nil,
+    }
+
+    use List::{*};
+    // use crate::pointers::refcell::list;
+    let value =  Rc::new(RefCell::new(5));
+    let a = Rc::new(Cons(Rc::clone(&value),Rc::new(Nil)));
+    let b = Cons(Rc::new(RefCell::new(6)),Rc::clone(&a));
+    let c = Cons(Rc::new(RefCell::new(10)), Rc::clone(&a));
+
+    *value.borrow_mut() += 10;
+
+    println!("a after = {:?}", a);
+    println!("b after = {:?}", b);
+    println!("c after = {:?}", c);
+}
+pub fn reference_cycles(){
+    #[derive(Debug)]
+    enum List {
+        Cons(i32, RefCell<Rc<List>>),
+        Nil,
+    }
+    use List::{*};
+    impl List {
+        fn tail(&self) -> Option<&RefCell<Rc<List>>> {
+            match self {
+                Cons(_, item) => Some(item),
+                Nil => None
+            }
+        }
+    }
+
+    #[derive(Debug)]
+    struct Node {
+        value: i32,
+        children: RefCell<Vec<Rc<Node>>>,
+    }
+    let leaf = Rc::new(
+        Node{ value: 3, children: RefCell::new(vec![]) }
+    );
+    let branch = Rc::new(
+        Node{ value: 5, children: RefCell::new(vec![Rc::clone(&leaf)]) }
+    );
 
 
 }

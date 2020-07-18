@@ -11,4 +11,3 @@ pub mod pointers;
 
 pub use common::c1;
 pub use structs::s1;
-pub use concurrency::c2;

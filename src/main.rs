@@ -1,9 +1,8 @@
 #![allow(unused_variables)]
 #[allow(unused_mut)]
-use rust_study::error::e2;
-use rust_study::generics_trait::{generics, traits, lifetime};
-use rust_study::pointers::{box1, deref_trait, drop_trait, Rc};
+use rust_study::concurrency::threads1;
+use rust_study::concurrency::{threads2, threads3, move1, message_passing, message_passing2, message_passing3, mutex, mutex1};
 
 fn main() {
-    Rc();
+    mutex1();
 }
