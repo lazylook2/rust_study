@@ -8,6 +8,7 @@ pub mod generics_trait;
 pub mod tests;
 pub mod iterators_closures;
 pub mod pointers;
+pub mod object_oriented;
 
 pub use common::c1;
 pub use structs::s1;
