@@ -165,7 +165,8 @@ pub fn mutex(){
 /// 在线程间共享 Mutex <br>
 /// 多线程和多所有权
 pub fn mutex1(){
-    let counter = Mutex::new(0);
+    // Rc<T> 并不能安全的在线程间共享，下面注释的代码报错
+    /*let counter = Mutex::new(0);
     let counter = Rc::new(Mutex::new(0)); // 使用Rc 和 clone()不安全
     let mut handles = vec![];
     for _ in 0..10 {
@@ -179,7 +180,7 @@ pub fn mutex1(){
     for handle in handles {
         handle.join().unwrap()
     }
-    println!("Result: {}", *counter.lock().unwrap());
+    println!("Result: {}", *counter.lock().unwrap());*/
 }
 
 /// 原子引用计数 Arc <br>
