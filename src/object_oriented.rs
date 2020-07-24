@@ -132,4 +132,46 @@ pub fn oo2 () {
 /// 面向对象设计模式的实现
 pub fn oo3(){
 
+    /// 博文
+    pub struct Post {
+        state: Option<Box<dyn State>>,
+        content: String
+    }
+    impl Post {
+        pub fn new () -> Post{
+            Post { state: Some(Box::new(Draft)), content: String::new() }
+        }
+        /// 插入博文内容
+        pub fn add_text(&mut self, text: &str) {
+            self.content.push_str(text)
+        }
+        /// 如果是草案状态就返回空
+        pub fn content(&self) -> &str{
+            ""
+        }
+        pub fn request_review(&mut self){
+            // 调用 take 方法将 state 字段中的 Some 值取出并留下一个 None
+            if let Some(s) = self.state.take() {
+                self.state = Some(s.request_review())
+            }
+        }
+
+    }
+    /// 状态
+    trait State {
+        fn request_review(self: Box<self>) -> Box<dyn State>;
+    }
+    // 草案
+    struct  Draft {}
+    impl State for Draft {
+        fn request_review(self: Box<_>) -> Box<dyn State> {
+            Box::new(PendingReview{})
+        }
+    }
+    struct PendingReview {}
+    impl State for PendingReview {
+        fn request_review(self: Box<_>) -> Box<dyn State> {
+            self
+        }
+    }
 }
