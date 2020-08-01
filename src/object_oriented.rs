@@ -134,44 +134,81 @@ pub fn oo3(){
 
     /// 博文
     pub struct Post {
-        state: Option<Box<dyn State>>,
+        state: Option<Box<dyn State>>, // 使用Option应该是状态，可以换为其他状态还可以清空为NONE
         content: String
     }
     impl Post {
         pub fn new () -> Post{
-            Post { state: Some(Box::new(Draft)), content: String::new() }
+            Post { state: Some(Box::new(Draft{})), content: String::new() }
         }
         /// 插入博文内容
         pub fn add_text(&mut self, text: &str) {
             self.content.push_str(text)
         }
         /// 如果是草案状态就返回空
+        /// 调用 Option 的 as_ref 方法是因为需要 Option 中值的引用而不是获取其所有权。
+        /// 因为 state 是一个 Option<Box<State>>，调用 as_ref 会返回一个 Option<&Box<State>>
+        /// 如果不调用 as_ref，将会得到一个错误，因为不能将 state 移动出借用的 &self 函数参数。
+        ///
+        /// 接着调用 unwrap 方法，这里我们知道它永远也不会 panic
         pub fn content(&self) -> &str{
-            ""
+            self.state.as_ref().unwrap().content(self)
         }
         pub fn request_review(&mut self){
             // 调用 take 方法将 state 字段中的 Some 值取出并留下一个 None
+            // 确保了当 Post 被转换为新状态后其不再能使用老的 state 值。
             if let Some(s) = self.state.take() {
                 self.state = Some(s.request_review())
+            }
+        }
+        pub fn approve(&mut self){
+            if let Some(s) = self.state.take() {
+                self.state = Some(s.approve())
             }
         }
 
     }
     /// 状态
     trait State {
-        fn request_review(self: Box<self>) -> Box<dyn State>;
+        fn request_review(self: Box<Self>) -> Box<dyn State>;
+        fn approve(self: Box<Self>) -> Box<dyn State>;
+        fn content<'a>(&self, post: &'a Post) -> &'a str {
+            ""
+        }
     }
     // 草案
     struct  Draft {}
     impl State for Draft {
-        fn request_review(self: Box<_>) -> Box<dyn State> {
+        fn request_review(self: Box<Self>) -> Box<dyn State> {
             Box::new(PendingReview{})
+        }
+
+        fn approve(self: Box<Self>) -> Box<dyn State> {
+            self
         }
     }
     struct PendingReview {}
     impl State for PendingReview {
-        fn request_review(self: Box<_>) -> Box<dyn State> {
+        fn request_review(self: Box<Self>) -> Box<dyn State> {
             self
+        }
+
+        fn approve(self: Box<Self>) -> Box<dyn State> {
+            self
+        }
+    }
+    struct Published {}
+
+    impl State for Published {
+        fn request_review(self: Box<Self>) -> Box<dyn State> {
+            self
+        }
+
+        fn approve(self: Box<Self>) -> Box<dyn State> {
+            self
+        }
+        fn content<'a>(&self, post: &'a Post) -> &'a str {
+            &post.content
         }
     }
 }
