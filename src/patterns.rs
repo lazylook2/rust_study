@@ -51,3 +51,24 @@ pub fn p1(){
     println!("{}, {}", x, z);
 
 }
+/// 所有的模式语法
+pub fn p2 () {
+    // 匹配字面值
+    let x = 1;
+    match x {
+        1 => println!("1"),
+        2 => println!("2"),
+        _ => println!("其他")
+    }
+
+    // 匹配命名变量
+    let x = Some(5);
+    let y = 10;
+
+    match x {
+        Some(50) => println!("到50了"),
+        Some(y) => println!("匹配到了，y = {:?}", y),
+        _ => println!("其他情况，x = {:?}", x)
+    }
+    println!("最后: x = {:?}, y = {:?}", x, y);
+}
