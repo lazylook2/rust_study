@@ -1,5 +1,3 @@
-use std::str::from_boxed_utf8_unchecked;
-
 /// 封装
 pub fn oo1() {
     pub struct AveragedCollection{
