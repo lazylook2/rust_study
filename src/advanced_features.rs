@@ -114,4 +114,6 @@ pub fn advanced_traits1() {
     println!("{}", "dd".to_string().len());
 
 }
+pub fn advanced_traits2 () {
 
+}
