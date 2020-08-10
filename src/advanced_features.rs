@@ -64,8 +64,54 @@ pub fn unsafe_rust4() {
     }
 }
 /// 访问或修改可变静态变量
-pub fn unsafe_rust5() {
+/// 通常静态变量的名称采用 SCREAMING_SNAKE_CASE 写法，并 必须 标注变量的类型
+pub unsafe fn unsafe_rust5() {
+    static HELLO_WORLD: &str = "Hello, world!";
+    println!("name is: {}", HELLO_WORLD);
 
+    static mut COUNTER: u32 = 0;
+    fn add_to_count(inc: u32) {
+        unsafe {
+            COUNTER += inc
+        }
+    }
+    add_to_count(3);
+    unsafe {
+        // 常量与静态变量的另一个区别在于静态变量可以是可变的。访问和修改可变静态变量都是 不安全 的。
+        // 此处如果不包unsafe就得  pub unsafe fn unsafe_rust5()
+        println!("COUNTER: {}", COUNTER);
+    }
 }
 /// 实现不安全 trait
+fn unsafe_rust6() {
+    unsafe trait Foo {
+        // methods go here
+    }
+
+    unsafe impl Foo for i32 {
+        // method implementations go here
+    }
+}
+/// 高级 trait
+/// 关联类型在 trait 定义中指定占位符类型
+/// 关联类型（associated types）是一个将类型占位符与 trait 相关联的方式，这样 trait 的方法签名中就可以使用这些占位符类型。
+pub fn advanced_traits1() {
+    pub trait Iterator {
+        type Item; // 返回数据类型
+        fn next(&mut self) -> Option<Self::Item>;
+    }
+
+    struct Counter { num: String }
+    impl Iterator for Counter {
+        type Item = u32; // 必须得是 Item
+
+        fn next(&mut self) -> Option<Self::Item> {
+            Some(self.num.len() as u32)
+        }
+    }
+    let mut cs = Counter{ num: "哈哈".to_string() };
+    println!("{}", cs.next().unwrap());
+    println!("{}", "dd".to_string().len());
+
+}
 
