@@ -115,5 +115,38 @@ pub fn advanced_traits1() {
 
 }
 pub fn advanced_traits2 () {
+    /*struct Counter {
+        count: u32,
+    }
+    impl Counter{
+        fn new () -> Counter{
+            Counter{ count: 0 }
+        }
+    }
+    impl Iterator for Counter{
+        type Item = u32;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            self.count += 1;
+            if self.count < 6 {
+                Some(self.count)
+            } else {
+                None
+            }
+        }
+    }
+    let mut counter = Counter::new();
+
+    assert_eq!(counter.next(), Some(1));
+    assert_eq!(counter.next(), Some(2));
+    assert_eq!(counter.next(), Some(3));
+    assert_eq!(counter.next(), Some(4));
+    assert_eq!(counter.next(), Some(5));
+    assert_eq!(counter.next(), None);
+
+    // 这里调用into_iter 返回的还是Counter类型
+    let couter_iter = counter.into_iter().count;
+    println!("counter.into_iter().count: {}", couter_iter);*/
+
 
 }

@@ -186,7 +186,7 @@ pub fn Iterator() {
 
     // 这里调用into_iter 返回的还是Counter类型
     let couter_iter = counter.into_iter().count;
-    println!("{}", couter_iter);
+    println!("counter.into_iter().count: {}", couter_iter);
 
 // 使用自定义迭代器中其他 Iterator trait 方法
     // 获取 Counter 实例产生的值，将这些值与另一个 Counter 实例在省略了第一个值之后产生的值配对，
