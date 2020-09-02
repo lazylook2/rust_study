@@ -95,7 +95,9 @@ fn unsafe_rust6() {
 /// 高级 trait
 /// 关联类型在 trait 定义中指定占位符类型
 /// 关联类型（associated types）是一个将类型占位符与 trait 相关联的方式，这样 trait 的方法签名中就可以使用这些占位符类型。
+use std::iter::Iterator;
 pub fn advanced_traits1() {
+    // use std::iter::Iterator;
     pub trait Iterator {
         type Item; // 返回数据类型
         fn next(&mut self) -> Option<Self::Item>;
@@ -112,6 +114,7 @@ pub fn advanced_traits1() {
     let mut cs = Counter{ num: "哈哈".to_string() };
     println!("{}", cs.next().unwrap());
     println!("{}", "dd".to_string().len());
+    println!("哈哈长度: {}（中文每个字符占3个字节）\t 正确使用：{}", String::from("哈哈").len(), String::from("哈哈").chars().count() as u32);
 
 }
 pub fn advanced_traits2 () {
@@ -148,5 +151,12 @@ pub fn advanced_traits2 () {
     let couter_iter = counter.into_iter().count;
     println!("counter.into_iter().count: {}", couter_iter);*/
 
+
+}
+/// 宏 <br>
+/// 使用 macro_rules! 的 声明宏 用于通用元编程<br>
+/// 声明宏允许我们编写一些类似 Rust match 表达式的代码。
+pub fn macros1() {
+    
 
 }
