@@ -96,6 +96,8 @@ fn unsafe_rust6() {
 /// 关联类型在 trait 定义中指定占位符类型
 /// 关联类型（associated types）是一个将类型占位符与 trait 相关联的方式，这样 trait 的方法签名中就可以使用这些占位符类型。
 use std::iter::Iterator;
+use std::ops::Add;
+
 pub fn advanced_traits1() {
     // use std::iter::Iterator;
     pub trait Iterator {
@@ -117,6 +119,21 @@ pub fn advanced_traits1() {
     println!("哈哈长度: {}（中文每个字符占3个字节）\t 正确使用：{}", String::from("哈哈").len(), String::from("哈哈").chars().count() as u32);
 
 }
+/// 默认泛型类型参数和运算符重载
+/// 默认泛型类型参数：当使用泛型类型参数时，可以为泛型指定一个默认的具体类型。
+/// 例子：运算符重载。std::ops 中所列出的运算符和相应的 trait 可以通过实现运算符相关 trait 来重载。
+///     RHS=Self：这个语法叫做 默认类型参数
+///     Self表示调用者的类型
+///     trait Add<RHS=Self> {
+///         type Output;
+///         fn add(self, rhs: RHS) -> Self::Output;
+///     }
+///
+/// 为了使 Millimeters 和 Meters 能够相加，
+/// 我们指定 impl Add<Meters> 来设定 RHS 类型参数的值而不是使用默认的 Self。
+/// 默认参数类型主要用于如下两个方面：
+///     扩展类型而不破坏现有代码。
+///     在大部分用户都不需要的特定情况进行自定义。
 pub fn advanced_traits2 () {
     /*struct Counter {
         count: u32,
@@ -151,7 +168,35 @@ pub fn advanced_traits2 () {
     let couter_iter = counter.into_iter().count;
     println!("counter.into_iter().count: {}", couter_iter);*/
 
+    // PartialEq ???????????????????????????????????
+    #[derive(Debug, PartialEq)]
+    struct Point {
+        x: i32,
+        y: i32,
+    }
+    impl Add for Point {
+        type Output = Point;
 
+        fn add(self, other: Point) -> Point {
+            Point{ x: self.x + other.x, y: self.y + other.y }
+        }
+    }
+    assert_eq!(Point{ x: 1, y: 0 } + Point{ x: 2, y: 3 }, Point{ x: 3, y: 3 });
+    #[derive(Debug)]
+    struct Millimeters(u32);
+    #[derive(Debug)]
+    struct Meters(u32);
+    // Add<Meters> 代表要加的类型为Meters（就是 + 后面的）
+    impl Add<Meters> for Millimeters {
+        type Output = Millimeters;
+        fn add(self, other: Meters) -> Millimeters {
+            Millimeters(self.0 + other.0 * 1000)
+        }
+    }
+    // let mi = Millimeters(1);
+    // let m = Meters(1);
+    // let r = mi + m;
+    println!("运算符重载：{:?} + {:?} = {:?}", Millimeters(3000), Meters(3), Millimeters(3000) + Meters(3))
 }
 /// 宏 <br>
 /// 使用 macro_rules! 的 声明宏 用于通用元编程<br>

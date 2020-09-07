@@ -7,5 +7,5 @@ use rust_study::patterns::{p1, p2};
 use rust_study::advanced_features::{unsafe_rust1, unsafe_rust3, unsafe_rust2, unsafe_rust4, unsafe_rust5, advanced_traits1, advanced_traits2};
 
 fn main() {
-    advanced_traits1()
+    advanced_traits2()
 }
