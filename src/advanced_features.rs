@@ -198,6 +198,43 @@ pub fn advanced_traits2 () {
     // let r = mi + m;
     println!("运算符重载：{:?} + {:?} = {:?}", Millimeters(3000), Meters(3), Millimeters(3000) + Meters(3))
 }
+/// 完全限定语法与消歧义：调用相同名称的方法
+pub fn advanced_traits3(){
+    /// 飞行员 接口
+    trait Pilot {
+        fn fly(&self);
+    }
+    /// 巫师 接口
+    trait Wizard {
+        fn fly(&self);
+    }
+    /// 实体
+    struct Human {
+        name: String
+    }
+
+    impl Pilot for Human {
+        fn fly(&self) {
+            println!("{}\t都让开，我要上天了！", self.name)
+        }
+    }
+    impl Wizard for Human {
+        fn fly(&self) {
+            println!("汝等{}\t退下，吾要作法了！", self.name)
+        }
+    }
+    impl Human{
+        fn fly(&self) {
+            println!("我{} 就静静的看着你们装逼！", self.name)
+        }
+    }
+
+    let person = Human{ name: String::from("智障") }; // 啥意思？？？？？？？？？？？
+    person.fly(); // 默认调用直接是现在类型上的方法
+    Pilot::fly(&person); //
+    Pilot::fly(&Human{ name: String::from("智障") }); // 同上
+
+}
 /// 宏 <br>
 /// 使用 macro_rules! 的 声明宏 用于通用元编程<br>
 /// 声明宏允许我们编写一些类似 Rust match 表达式的代码。
