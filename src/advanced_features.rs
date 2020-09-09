@@ -234,6 +234,27 @@ pub fn advanced_traits3(){
     Pilot::fly(&person); //
     Pilot::fly(&Human{ name: String::from("智障") }); // 同上
 
+///////// 关联函数是 trait 的一部分，但没有 self 参数。 ///////
+    trait Animal {
+        fn baby_name(name: &str) -> String;
+    }
+    struct Dog {
+        name: String
+    };
+    impl Dog {
+        fn baby_name(name: &str) -> String {
+            format!("Spot  {}", name)
+        }
+    }
+    impl Animal for Dog {
+        fn baby_name(name: &str) -> String {
+            // String::from("puppy")
+            format!("属于动物的狗的名字：{}", name)
+        }
+    }
+    println!("{}", Dog::baby_name("小黑"));
+    // 方法无self参数
+    println!("{}", <Dog as Animal>::baby_name("小狗"));
 }
 /// 宏 <br>
 /// 使用 macro_rules! 的 声明宏 用于通用元编程<br>
